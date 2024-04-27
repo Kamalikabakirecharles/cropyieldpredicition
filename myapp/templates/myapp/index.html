@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Yield Prediction</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Crop Yield Prediction</h2>
+      <form id="prediction-form">
+        {% csrf_token %}
+        <label for="rainfall">Rain Fall (mm):</label>
+        <input type="text" id="rainfall" name="rainfall" required />
+
+        <label for="fertilizer">Fertilizer:</label>
+        <input type="text" id="fertilizer" name="fertilizer" required />
+
+        <label for="temperature">Temperature:</label>
+        <input type="text" id="temperature" name="temperature" required />
+
+        <label for="nitrogen">Nitrogen (N):</label>
+        <input type="text" id="nitrogen" name="nitrogen" required />
+
+        <label for="phosphorus">Phosphorus (P):</label>
+        <input type="text" id="phosphorus" name="phosphorus" required />
+
+        <label for="potassium">Potassium (K):</label>
+        <input type="text" id="potassium" name="potassium" required />
+
+        <input type="submit" value="Predict" />
+      </form>
+    </div>
+    <div
+      class="modal fade"
+      id="predictionResultModal"
+      tabindex="-1"
+      aria-labelledby="predictionResultLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="predictionResultLabel">
+              Prediction Result
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p id="predictionResultText">Loading prediction...</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#prediction-form").submit(function (event) {
+          event.preventDefault(); // Prevent form submission
+
+          // Send form data to server using AJAX
+          $.ajax({
+            type: "POST",
+            url: "/predict/",
+            data: $("#prediction-form").serialize(),
+            success: function (response) {
+              // Set the modal's body text and show the modal
+              $("#predictionResultText").text(
+                "Predicted crop yield: " +
+                  response.prediction[0].toFixed(2) +
+                  " Q/acre"
+              );
+              $("#predictionResultModal").modal("show");
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
