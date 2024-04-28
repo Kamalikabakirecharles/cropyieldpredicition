@@ -11,29 +11,83 @@
     />
 
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/RAB_Logo2.png' %}"
+    />
   </head>
   <body>
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a href="/" class="navbar-logo">
+          <img
+            src="{% static 'images/RAB_Logo2.png' %}"
+            alt="Logo"
+            style="height: 50px"
+          />
+          <!-- Update path as necessary -->
+        </a>
+        <button onclick="window.history.back();" class="back-button">
+          &#8592; Back
+        </button>
+      </div>
+    </nav>
+
+    <!-- Loader div -->
+    <div class="loader"></div>
     <div class="container">
       <h2>Crop Yield Prediction</h2>
       <form id="prediction-form">
         {% csrf_token %}
         <label for="rainfall">Rain Fall (mm):</label>
-        <input type="text" id="rainfall" name="rainfall" required />
+        <input
+          type="number"
+          id="rainfall"
+          name="rainfall"
+          required
+          max="1300"
+        />
 
         <label for="fertilizer">Fertilizer:</label>
-        <input type="text" id="fertilizer" name="fertilizer" required />
+        <input
+          type="number"
+          id="fertilizer"
+          name="fertilizer"
+          required
+          max="80"
+        />
 
         <label for="temperature">Temperature:</label>
-        <input type="text" id="temperature" name="temperature" required />
+        <input
+          type="number"
+          id="temperature"
+          name="temperature"
+          required
+          max="40"
+        />
 
         <label for="nitrogen">Nitrogen (N):</label>
-        <input type="text" id="nitrogen" name="nitrogen" required />
+        <input type="number" id="nitrogen" name="nitrogen" required max="80" />
 
         <label for="phosphorus">Phosphorus (P):</label>
-        <input type="text" id="phosphorus" name="phosphorus" required />
+        <input
+          type="number"
+          id="phosphorus"
+          name="phosphorus"
+          required
+          max="25"
+        />
 
         <label for="potassium">Potassium (K):</label>
-        <input type="text" id="potassium" name="potassium" required />
+        <input
+          type="number"
+          id="potassium"
+          name="potassium"
+          required
+          max="22"
+        />
 
         <input type="submit" value="Predict" />
       </form>
@@ -81,12 +135,18 @@
         $("#prediction-form").submit(function (event) {
           event.preventDefault(); // Prevent form submission
 
+          // Show the loader
+          $(".loader").show();
+
           // Send form data to server using AJAX
           $.ajax({
             type: "POST",
             url: "/predict/",
             data: $("#prediction-form").serialize(),
             success: function (response) {
+              // Hide the loader
+              $(".loader").hide();
+
               // Set the modal's body text and show the modal
               $("#predictionResultText").text(
                 "Predicted crop yield: " +
@@ -94,6 +154,13 @@
                   " Q/acre"
               );
               $("#predictionResultModal").modal("show");
+            },
+            error: function (xhr, status, error) {
+              // Hide the loader
+              $(".loader").hide();
+
+              // Handle error
+              console.error(xhr.responseText);
             },
           });
         });
